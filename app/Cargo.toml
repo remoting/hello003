@@ -1,0 +1,10 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ctor = "0.2.9"
+frame = { path = "../frame" }
+frame_support = { path = "../frame_support" }
+lazy_static = "1.5.0"
