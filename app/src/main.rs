@@ -1,43 +1,65 @@
-use frame::{singleton};
-use frame_support::{get_instance_by_key,get_instance_by_type, get_type_name};
+use frame::{singleton, register_command};
+use frame_support::{get_instance_by_key,get_instance_by_type, get_type_name, get_function};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use lazy_static::lazy_static;
- 
+use log::{info, warn};  
+
 #[singleton]
 struct MyStruct1 {
     field: i32,
 }
- 
+
+impl MyStruct1 {
+    #[register_command]
+    pub fn test1(&self) -> String {
+        format!("MyStruct1 {{ field: {} }}", self.field)
+    }
+
+    #[register_command]
+    pub fn test2(&self) -> String {
+        format!("MyStruct1 {{ field: {} }}", self.field)
+    }
+}
+
 #[singleton]
 struct MyStruct2 {
     field: i32,
 }
 
-fn test001() -> Option<String> {
+// fn test001() -> Option<String> {
+//     if let Some(instance1) = get_instance_by_type::<MyStruct1>() {
+//         let mut instance1 = instance1.read().unwrap();  
+//         info!("MyStruct1 field after modification: {}", instance1.field); // 使用日志记录
+//     }
 
-    if let Some(instance1) = get_instance_by_type::<MyStruct1>() {
-        let mut instance1 = instance1.read().unwrap();  
-        println!("MyStruct1 field after modification: {}", instance1.field);
-    }
+//     if let Some(instance1) = get_instance_by_type::<MyStruct1>() {
+//         let mut instance1 = instance1.write().unwrap(); // 获取可变引用
+//         instance1.field = 42; // 修改 instance1 的 field 字段
+//         info!("MyStruct1 field after modification: {}", instance1.field); // 使用日志记录
+//     }
 
-    if let Some(instance1) = get_instance_by_type::<MyStruct1>() {
-        let mut instance1 = instance1.write().unwrap(); // 获取可变引用
-        instance1.field = 42; // 修改 instance1 的 field 字段
-        println!("MyStruct1 field after modification: {}", instance1.field);
-    }
+//     if let Some(instance1) = get_instance_by_type::<MyStruct1>() {
+//         let instance1 = instance1.read().ok()?;  
+//         info!("MyStruct1 field after modification: {}", instance1.field); // 使用日志记录
+//         info!("MyStruct1 field after modification: {}", instance1.test1()); // 使用日志记录
+//     }
 
-    if let Some(instance1) = get_instance_by_type::<MyStruct1>() {
-        let mut instance1 = instance1.read().unwrap();  
-        println!("MyStruct1 field after modification: {}", instance1.field);
-    }
-
-    println!("StructName: {}", get_type_name::<MyStruct1>());
-    None
-}
+//     info!("StructName: {}", get_type_name::<MyStruct1>()); // 使用日志记录
+//     None
+// }
 
 fn main() {
-   if let Some(str) = test001() {
-        println!("{}", str);
-   }
+    log4rs::init_file("log4rs.yaml", Default::default()).unwrap();
+    // env_logger::init(); // 初始化日志记录
+
+    // 打印注册的 handler
+    let handler_map = frame_support::get_handler_map().read().unwrap();
+    for (name, _) in handler_map.iter() {
+        println!("Registered handler: {}", name);
+    }
+
+    // if let Some(str) = test001() {
+    //     println!("{}", str);
+    // }
 }

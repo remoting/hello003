@@ -1,11 +1,12 @@
 use std::collections::HashMap;
-use std::sync::RwLock;
+use std::sync::{Arc, RwLock};
 use lazy_static::lazy_static;
 use std::any::Any;
 use std::any::type_name;
 
 lazy_static! {
     static ref INSTANCE_MAP: RwLock<HashMap<String, Box<dyn Any + Send + Sync>>> = RwLock::new(HashMap::new());
+    static ref HANDLER_MAP: Arc<RwLock<HashMap<&'static str, fn()>>> = Arc::new(RwLock::new(HashMap::new()));
 }
 
 pub fn get_instance_by_type<T: 'static + Send + Sync>() -> Option<std::sync::Arc<RwLock<T>>> {
@@ -31,4 +32,14 @@ pub fn register_instance_by_type<T: 'static + Send + Sync>(instance: std::sync::
 
 pub fn get_type_name<T: 'static + Send + Sync>() -> String {
     type_name::<T>().to_string()
+}
+
+pub fn register_function(name: &'static str, func: fn()) {
+    let mut map = HANDLER_MAP.write().unwrap();
+    map.insert(name, func);
+}
+
+pub fn get_function(name: &str) -> Option<fn()> {
+    let map = HANDLER_MAP.read().unwrap();
+    map.get(name).cloned()
 }

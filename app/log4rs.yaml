@@ -1,0 +1,16 @@
+appenders:
+  file:
+    kind: file
+    path: "logs/output.log"
+    encoder:
+      pattern: "{d(%Y-%m-%d %H:%M:%S)} [{l}] {f}:{L} - {m}{n}"
+  console:
+    kind: console
+    encoder:
+      pattern: "{d(%Y-%m-%d %H:%M:%S)} [{l}] {f}:{L} - {m}{n}"
+
+root:
+  level: info
+  appenders:
+    - file
+    - console
