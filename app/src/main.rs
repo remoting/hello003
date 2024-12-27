@@ -23,6 +23,14 @@ impl MyStruct1 {
         format!("MyStruct1 {{ field: {} }}", self.field)
     }
 }
+#[controller(command)]
+impl MyStruct1 {
+    #[command]
+    pub fn test3(&self) -> String {
+        format!("hello method called with field: {}", self.field)
+    }
+    
+}
 
 #[singleton]
 struct MyStruct2 {
