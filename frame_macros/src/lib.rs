@@ -90,14 +90,20 @@ pub fn singleton(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         #input
-
+        struct #name {
+            #(#fields),*,
+            methods: std::collections::HashMap<String, fn(&#name, String) -> String>,
+        }
         impl #name {
             fn new() -> Self {
                 #name {
-                    #(#fields),*
+                    #(#fields),*,
+                    methods: std::collections::HashMap::new(),
                 }
             }
-
+            pub fn get_method(&self,name:&str) -> Option<fn(&MyStruct1,String) -> String> {
+                self.methods.get(name).cloned()
+            }
             pub fn get_instance() -> std::sync::Arc<std::sync::RwLock<Self>> {
                 frame_support::get_instance_by_type::<Self>().unwrap()
             }

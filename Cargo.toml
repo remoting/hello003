@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "frame",
     "app",
+    "frame_macros",
     "frame_support",
 ]
