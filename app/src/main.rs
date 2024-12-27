@@ -5,7 +5,7 @@ use std::sync::{Arc, RwLock};
 use lazy_static::lazy_static;
 use log::{info, warn};  
 
-#[singleton()]
+#[singleton]
 #[derive(hello)]
 struct MyStruct1 {
     field: i32, 
@@ -30,7 +30,7 @@ impl MyStruct1 {
     } 
 }
 
-#[singleton()]
+//#[singleton]
 struct MyStruct2 {
     field: i32,
 }
@@ -69,16 +69,15 @@ fn test001() -> Option<String> {
 }
 
 fn test002() {
-
-    let mut instance = MyStruct1::get_instance();
-
-    // if let Some(func) = instance.get_method("test1") {
-    //     let r = func(&instance,"".to_string());
-
-    //     info!("--{}--", r);
-
-    // }
+    let instance = MyStruct1::get_instance();
+    let mut instance = instance.write().unwrap();
+    instance.methods.insert("test1".to_string(), MyStruct1::test1);
+    if let Some(func) = instance.get_method("test1") {
+        let r = func(&instance,"".to_string()); 
+        info!("--{}--", r); 
+    }
 }
+
 fn main() {
     log4rs::init_file("./app/log4rs.yaml", Default::default()).unwrap();
     //log4rs::init_file("./log4rs.yaml", Default::default()).unwrap();

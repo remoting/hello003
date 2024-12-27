@@ -1,5 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
+use syn::parse::Parser;
 use syn::{parse_macro_input, DeriveInput, Fields, ItemFn, ItemStruct, ItemImpl, ImplItem}; 
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
@@ -76,32 +77,37 @@ pub fn hello(input: TokenStream) -> TokenStream {
 // 保留 singleton 宏的原始实现
 #[proc_macro_attribute]
 pub fn singleton(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let input = parse_macro_input!(item as ItemStruct);
+    let mut input = parse_macro_input!(item as ItemStruct);
     let name = &input.ident;
-    let fields = if let Fields::Named(fields) = &input.fields {
-        fields.named.iter().map(|f| {
-            let name = &f.ident;
+
+    // 添加一个字段，用于存储方法
+    let methods_field: syn::Field = syn::Field::parse_named.parse2(quote! { methods: std::collections::HashMap<String, fn(&#name, String) -> String> }).unwrap();
+    
+    if let Fields::Named(ref mut fields) = input.fields {
+        fields.named.push(methods_field);
+    }
+
+    let fields_init = input.fields.iter().map(|f| {
+        let name = &f.ident;
+        if name.as_ref().unwrap() == "methods" {
+            quote! { #name: std::collections::HashMap::new() }
+        } else {
             quote! { #name: Default::default() }
-        }).collect::<Vec<_>>()
-    } else {
-        vec![]
-    };
+        }
+    }).collect::<Vec<_>>();
+
+    // 获取结构体名称
     let register_fn_name = syn::Ident::new(&format!("register_singleton_{}", name), name.span());
 
     let expanded = quote! {
         #input
-        struct #name {
-            #(#fields),*,
-            methods: std::collections::HashMap<String, fn(&#name, String) -> String>,
-        }
         impl #name {
             fn new() -> Self {
                 #name {
-                    #(#fields),*,
-                    methods: std::collections::HashMap::new(),
+                    #(#fields_init),*
                 }
             }
-            pub fn get_method(&self,name:&str) -> Option<fn(&MyStruct1,String) -> String> {
+            pub fn get_method(&self, name: &str) -> Option<fn(&#name, String) -> String> {
                 self.methods.get(name).cloned()
             }
             pub fn get_instance() -> std::sync::Arc<std::sync::RwLock<Self>> {
