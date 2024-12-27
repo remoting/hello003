@@ -1,4 +1,4 @@
-use frame::{singleton, register_command,hello,command};
+use frame::{singleton, register_command,hello,command,controller};
 use frame_support::{get_instance_by_key,get_instance_by_type, get_type_name, get_function};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
@@ -11,13 +11,14 @@ struct MyStruct1 {
     field: i32,
 }
 
-#[controller]
+#[controller(command)]
 impl MyStruct1 {
     #[command]
     pub fn test1(&self) -> String {
         format!("MyStruct1 {{ field: {} }}", self.field)
     }
  
+    #[command]
     pub fn test2(&self) -> String {
         format!("MyStruct1 {{ field: {} }}", self.field)
     }

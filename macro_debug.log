@@ -1,2 +1,0 @@
-Generating code for: Ident { ident: "MyStruct1", span: #0 bytes(283..292) }
-Register function name: Ident { ident: "register_singleton_MyStruct1", span: #0 bytes(283..292) }
