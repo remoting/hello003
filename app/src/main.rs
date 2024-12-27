@@ -40,22 +40,29 @@ struct MyStruct2 {
 fn test001() -> Option<String> {
     if let Some(instance1) = get_instance_by_type::<MyStruct1>() {
         let mut instance1 = instance1.read().unwrap();  
-        info!("MyStruct1 field after modification: {}", instance1.field); // 使用日志记录
+        info!("MyStruct1 field after modification: {}", instance1.field);  
     }
 
     if let Some(instance1) = get_instance_by_type::<MyStruct1>() {
-        let mut instance1 = instance1.write().unwrap(); // 获取可变引用
-        instance1.field = 42; // 修改 instance1 的 field 字段
-        info!("MyStruct1 field after modification: {}", instance1.field); // 使用日志记录
+        let mut instance1 = instance1.write().unwrap();  
+        instance1.field = 42;  
+        info!("MyStruct1 field after modification: {}", instance1.field);  
     }
 
     if let Some(instance1) = get_instance_by_type::<MyStruct1>() {
         let instance1 = instance1.read().ok()?;  
-        info!("MyStruct1 field after modification: {}", instance1.field); // 使用日志记录
-        info!("MyStruct1 field after modification: {}", instance1.test1()); // 使用日志记录
+        info!("MyStruct1 field after modification: {}", instance1.field);  
+        info!("MyStruct1 field after modification: {}", instance1.test1());  
     }
 
-    info!("StructName: {}", get_type_name::<MyStruct1>()); // 使用日志记录
+    info!("StructName: {}", get_type_name::<MyStruct1>());  
+
+
+    if let Some(instance2) = get_instance_by_type::<MyStruct2>() {
+        let instance2 = instance2.read().ok()?;  
+        info!("MyStruct2 field after modification: {}", instance2.field);  
+    }
+
     None
 }
 
@@ -64,9 +71,6 @@ fn main() {
     // env_logger::init(); // 初始化日志记录
     
     test001();
-    let instance = MyStruct1 { field: 42 };
-    info!("ss{}www", instance.hello_method());
-    info!("MyStruct1 instance created with field: {}", instance.field);
  
     // 打印注册的 handler
     // let handler_map = frame_support::get_handler_map().read().unwrap();
