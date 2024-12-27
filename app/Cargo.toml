@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 ctor = "0.2.9"
 frame_macros = { path = "../frame_macros" }
-frame_support = { path = "../frame_support" }
+frame = { path = "../frame" }
 lazy_static = "1.5.0"
 log = "0.4.22"
 log4rs = "1.3.0"

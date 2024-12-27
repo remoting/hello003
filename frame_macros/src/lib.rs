@@ -111,14 +111,14 @@ pub fn singleton(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 self.methods.get(name).cloned()
             }
             pub fn get_instance() -> std::sync::Arc<std::sync::RwLock<Self>> {
-                frame_support::get_instance_by_type::<Self>().unwrap()
+                frame::spring::get_instance_by_type::<Self>().unwrap()
             }
         }
 
         #[ctor::ctor]
         fn #register_fn_name() {
             let instance = std::sync::Arc::new(std::sync::RwLock::new(#name::new()));
-            frame_support::register_instance_by_type(instance.clone());
+            frame::spring::register_instance_by_type(instance.clone());
         }
     };
 
