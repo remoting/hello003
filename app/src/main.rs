@@ -1,4 +1,4 @@
-use frame_macros::{singleton, register_command,hello,command,controller};
+use frame_macros::{singleton, hello,command,controller};
 use frame::spring::{get_instance_by_key,get_instance_by_type, get_type_name, get_function};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
