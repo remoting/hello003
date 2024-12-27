@@ -1,9 +1,12 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput, Fields, ItemFn, ItemStruct, ItemImpl}; 
+use syn::{parse_macro_input, DeriveInput, Fields, ItemFn, ItemStruct, ItemImpl, ImplItem, Item}; 
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use lazy_static::lazy_static;
+use log::info;
+use std::fs::File;
+use std::io::Write;
 
 #[proc_macro_attribute]
 pub fn command(_attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -30,10 +33,32 @@ pub fn spring(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let name = &input.ident;
 
+    // 解析 DeriveInput 中的实现块
+    let mut methods = Vec::new();
+    for attr in &input.attrs {
+        if let Ok(Item::Impl(impl_block)) = syn::parse2::<Item>(attr.tokens.clone()) {
+            if *impl_block.self_ty == syn::parse_quote!(#name) {
+                for item in impl_block.items {
+                    if let ImplItem::Method(method) = item {
+                        let method_name = &method.sig.ident;
+                        // 记录方法名称
+                        methods.push(method_name.to_string());
+                    }
+                }
+            }
+        }
+    }
+
+    // 输出方法名称到文件
+    let mut file = std::fs::File::create("macro_debug.log").unwrap();
+    for method in &methods {
+        writeln!(file, "Method: {}", method).unwrap();
+    }
+
     let expanded = quote! {
         impl #name {
-            pub fn hello(&self) {
-                println!("Hello from {}", stringify!(#name));
+            pub fn spring_method(&self) -> String {
+                format!("Spring method called with field: {}", self.field)
             }
         }
     };

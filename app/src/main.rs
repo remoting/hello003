@@ -1,28 +1,28 @@
-use frame::{singleton, register_command};
+use frame::{singleton, register_command,spring};
 use frame_support::{get_instance_by_key,get_instance_by_type, get_type_name, get_function};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use lazy_static::lazy_static;
 use log::{info, warn};  
 
-#[singleton]
+#[derive(spring)]
 struct MyStruct1 {
     field: i32,
 }
 
 impl MyStruct1 {
-    #[register_command]
+    //#[register_command]
     pub fn test1(&self) -> String {
         format!("MyStruct1 {{ field: {} }}", self.field)
     }
 
-    #[register_command]
+    //#[register_command]
     pub fn test2(&self) -> String {
         format!("MyStruct1 {{ field: {} }}", self.field)
     }
 }
 
-#[singleton]
+//#[singleton]
 struct MyStruct2 {
     field: i32,
 }
@@ -50,14 +50,18 @@ struct MyStruct2 {
 // }
 
 fn main() {
-    log4rs::init_file("log4rs.yaml", Default::default()).unwrap();
+    log4rs::init_file("./app/log4rs.yaml", Default::default()).unwrap();
     // env_logger::init(); // 初始化日志记录
-
+    
+    let instance = MyStruct1 { field: 42 };
+    info!("ss{}www", instance.spring_method());
+    info!("MyStruct1 instance created with field: {}", instance.field);
+ 
     // 打印注册的 handler
-    let handler_map = frame_support::get_handler_map().read().unwrap();
-    for (name, _) in handler_map.iter() {
-        println!("Registered handler: {}", name);
-    }
+    // let handler_map = frame_support::get_handler_map().read().unwrap();
+    // for (name, _) in handler_map.iter() {
+    //     println!("Registered handler: {}", name);
+    // }
 
     // if let Some(str) = test001() {
     //     println!("{}", str);
