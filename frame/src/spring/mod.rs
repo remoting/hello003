@@ -4,6 +4,9 @@ use lazy_static::lazy_static;
 use std::any::Any;
 use std::any::type_name;
 
+pub mod traits;
+
+
 lazy_static! {
     static ref INSTANCE_MAP: RwLock<HashMap<String, Box<dyn Any + Send + Sync>>> = RwLock::new(HashMap::new());
     static ref HANDLER_MAP: Arc<RwLock<HashMap<&'static str, fn()>>> = Arc::new(RwLock::new(HashMap::new()));
