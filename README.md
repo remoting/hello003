@@ -27,3 +27,6 @@ my-rust-project
 ## 使用说明
 
 请参阅各个子项目的 `README.md` 文件以获取详细的使用说明和配置方法。
+
+
+ cargo run --bin main1
