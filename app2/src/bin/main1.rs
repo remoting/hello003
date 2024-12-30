@@ -1,22 +1,36 @@
  
 use std::any::Any;
+use std::ptr::null;
 use std::sync::Arc;
 use std::collections::HashMap;
 
-trait Interface: Any + Send + Sync {}
+pub trait Interface: Any + Send + Sync {}
 impl<T: Any + Send + Sync> Interface for T {}
-
+pub trait Component<M>: Interface {
+    type Interface: ?Sized;
+}
 struct Module {
     components: HashMap<String, Arc<dyn Any + Send + Sync>>,
 }
 
 impl Module {
-    fn resolve_ref<T: Interface>(&self, name: &str) -> Option<&T> {
-        let key = std::any::type_name::<T>();
-        if let Some(component) = self.components.get(name) {
-            component.downcast_ref::<T>()
+    // fn resolve_ref(&self, name: &str) -> Option<&T> {
+    //     let key = std::any::type_name::<T>();
+    //     if let Some(component) = self.components.get(name) {
+    //         //component.downcast_ref::<T>()
+    //         ::std::sync::Arc::as_ref(component.downcast_ref())
+    //     }else {
+    //         None
+    //     } 
+    // }
+    // 使用完全限定语法
+    fn resolve_ref(&self) -> &<HelloWorldImpl as Component<Self>>::Interface {
+        let key = std::any::type_name::<HelloWorldImpl>();
+        if let Some(component) = self.components.get("HelloWorldImpl") {
+            //component.downcast_ref::<T>()
+            ::std::sync::Arc::as_ref(component.downcast_ref().unwrap())
         }else {
-            None
+            null()
         } 
     }
     // fn resolve_ref<T: Any+Send+Sync>(&self, name: &str) -> &T {
@@ -52,7 +66,7 @@ fn main() {
     // 创建模块
     let module = Module { components };
 
-    if let Some(x) = module.resolve_ref::<HelloWorldImpl>("HelloWorldImpl") {
+    if let Some(x) = module.resolve_ref() {
         let hello_world: &dyn HelloWorld = x;
         println!("x is {}",hello_world.say_hello());
     }
