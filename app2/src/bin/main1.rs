@@ -11,7 +11,7 @@ struct Module {
 }
 
 impl Module {
-    fn resolve_ref<T: Interface>(&self) -> &T {
+    fn resolve_ref<T: Interface>(&self, name: &str) -> &T {
         let key = std::any::type_name::<T>();
         let component = self.components
             .get("HelloWorldImpl")
@@ -21,6 +21,16 @@ impl Module {
 
         component
     }
+    // fn resolve_ref<T: Any+Send+Sync>(&self, name: &str) -> &T {
+    //     //let key = std::any::type_name::<T>();
+    //     let component = self.components
+    //         .get(name)
+    //         .expect("Component not found")
+    //         .downcast_ref::<T>()
+    //         .expect("Failed to downcast component");
+
+    //     component
+    // }
 }
 // 定义一个特性
 trait HelloWorld: Interface {
@@ -45,7 +55,7 @@ fn main() {
     let module = Module { components };
 
     // 获取组件并调用方法
-    let hello_world: &HelloWorldImpl = module.resolve_ref();
+    let hello_world: &dyn HelloWorld = module.resolve_ref::<HelloWorldImpl>("HelloWorldImpl");
     hello_world.say_hello();
 }
  
