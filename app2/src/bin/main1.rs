@@ -11,15 +11,13 @@ struct Module {
 }
 
 impl Module {
-    fn resolve_ref<T: Interface>(&self, name: &str) -> &T {
+    fn resolve_ref<T: Interface>(&self, name: &str) -> Option<&T> {
         let key = std::any::type_name::<T>();
-        let component = self.components
-            .get("HelloWorldImpl")
-            .expect("Component not found")
-            .downcast_ref::<T>()
-            .expect("Failed to downcast component");
-
-        component
+        if let Some(component) = self.components.get(name) {
+            component.downcast_ref::<T>()
+        }else {
+            None
+        } 
     }
     // fn resolve_ref<T: Any+Send+Sync>(&self, name: &str) -> &T {
     //     //let key = std::any::type_name::<T>();
@@ -34,15 +32,15 @@ impl Module {
 }
 // 定义一个特性
 trait HelloWorld: Interface {
-    fn say_hello(&self);
+    fn say_hello(&self) -> String;
 }
 
 // 实现特性的结构体
 struct HelloWorldImpl;
 
 impl HelloWorld for HelloWorldImpl {
-    fn say_hello(&self) {
-        println!("Hello, world!");
+    fn say_hello(&self) -> String {
+        "Hello, world!".to_string()
     }
 }
 fn main() {
@@ -54,9 +52,13 @@ fn main() {
     // 创建模块
     let module = Module { components };
 
-    // 获取组件并调用方法
-    let hello_world: &dyn HelloWorld = module.resolve_ref::<HelloWorldImpl>("HelloWorldImpl");
-    hello_world.say_hello();
+    if let Some(x) = module.resolve_ref::<HelloWorldImpl>("HelloWorldImpl") {
+        let hello_world: &dyn HelloWorld = x;
+        println!("x is {}",hello_world.say_hello());
+    }
+    // // 获取组件并调用方法
+    // let hello_world: &dyn HelloWorld = module.resolve_ref::<HelloWorldImpl>("HelloWorldImpl");
+    // hello_world.say_hello();
 }
  
 
